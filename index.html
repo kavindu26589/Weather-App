@@ -3,19 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Weather Dashboard</title>
+  <title>Enhanced Weather App</title>
   <link rel="stylesheet" href="style.css"/>
+
+  <!-- Leaflet CSS (for interactive maps) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-sA+S4Ph4iAwb8ZfXkJpgg6X3Ur9gG4UZaMw3dMSp0jU="
+    crossorigin=""
+  />
+
+  <!-- Chart.js (for interactive charts) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"
+    integrity="sha384-B0DwNsc7eLElg6qQLrPBSAH5KZ0R4cOWQCl+4jvUBp3GhISfEkcQKJS7mB9+Zh4v"
+    crossorigin="anonymous"
+  ></script>
 </head>
 <body>
   <div id="loadingSpinner" class="spinner">Loading...</div>
 
   <div class="container">
-    <h1>🌤️ Weather App</h1>
+    <h1>🌤️ Enhanced Weather App</h1>
 
-    <!-- Search Bar for Any City -->
-    <div style="margin-bottom: 15px;">
+    <!-- Search for any city -->
+    <div class="search-bar">
       <input type="text" id="cityInput" placeholder="Enter city name" />
       <button id="searchBtn">Search</button>
+    </div>
+
+    <!-- Favorites & Multi-City Comparison -->
+    <div class="favorites">
+      <h2>Favorites</h2>
+      <ul id="favoritesList"></ul>
+      <button id="compareBtn">Compare Selected</button>
     </div>
 
     <p id="errorMessage" class="error"></p>
@@ -37,10 +59,21 @@
     <h2>5-Day Forecast</h2>
     <div id="forecast"></div>
 
-    <!-- City Map -->
+    <!-- City Map (Interactive with Leaflet) -->
     <h2>City Map</h2>
     <div id="map"></div>
+
+    <!-- Chart.js Container for Multi-City Comparison -->
+    <h2>Comparison Chart</h2>
+    <canvas id="comparisonChart" width="400" height="200"></canvas>
   </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-Q+4S+C4x2E1phmT37U5ft6pugQ3MGwBzCwXmk6rE4fE="
+    crossorigin=""
+  ></script>
 
   <script src="script.js"></script>
 </body>
