@@ -1,4 +1,4 @@
-const apiKey = "cf5e9dddc2888b05fc9113c54400f53a"; // Replace with your API key
+const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; // Replace with your API key
 const airQualityKey = "cf5e9dddc2888b05fc9113c54400f53a"; 
 
 let isCelsius = true;
@@ -6,14 +6,12 @@ let lastSearchedCity = "";
 
 // Ensure DOM is fully loaded before running script
 document.addEventListener("DOMContentLoaded", function() {
-    // Load last searched city
     let lastCity = localStorage.getItem("lastCity");
     if (lastCity) {
         document.getElementById("cityInput").value = lastCity;
         getWeather(lastCity);
     }
 
-    // Toggle temperature unit (°C / °F)
     document.getElementById("unitToggle").addEventListener("change", function() {
         isCelsius = !isCelsius;
         let label = isCelsius ? "Switch to °F" : "Switch to °C";
@@ -23,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (city) getWeather(city);
     });
 
-    // Enable voice search
     document.getElementById("voiceSearch").addEventListener("click", () => {
         let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "en-US";
@@ -37,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Fetch city suggestions from OpenWeather API
 async function fetchCitySuggestions(query) {
-    if (query.length < 3) return;
+    if (query.length < 3) return; 
 
     const cityApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`;
 
@@ -66,29 +63,37 @@ document.getElementById("cityInput").addEventListener("input", function () {
 
 // Get weather data
 async function getWeather(city = null, lat = null, lon = null) {
+    document.getElementById("errorMessage").textContent = ""; // Clear previous errors
+
     if (!city && (lat === null || lon === null)) {
-        document.getElementById("errorMessage").textContent = "Please enter a city or enable location!";
+        document.getElementById("errorMessage").textContent = "Please enter a valid city or enable location!";
         return;
     }
 
-    let url = city 
-        ? `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric` 
-        : `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+    let url;
+    if (city) {
+        url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+    } else if (lat !== null && lon !== null) {
+        url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+    } else {
+        console.error("Invalid API call: No city or coordinates provided");
+        return;
+    }
 
     try {
         const response = await fetch(url);
         const data = await response.json();
 
-        if (data.cod === 200) {
+        if (response.ok) {
             displayWeather(data);
             getAQI(data.coord.lat, data.coord.lon);
-            document.getElementById("errorMessage").textContent = "";
             localStorage.setItem("lastCity", city);
         } else {
-            document.getElementById("errorMessage").textContent = "City not found!";
+            document.getElementById("errorMessage").textContent = `City not found! (${data.message})`;
         }
     } catch (error) {
         document.getElementById("errorMessage").textContent = "Error fetching weather data.";
+        console.error("Weather API error:", error);
     }
 }
 
@@ -97,10 +102,15 @@ function getLocationWeather() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                getWeather(null, position.coords.latitude, position.coords.longitude);
+                if (position.coords.latitude && position.coords.longitude) {
+                    getWeather(null, position.coords.latitude, position.coords.longitude);
+                } else {
+                    document.getElementById("errorMessage").textContent = "Unable to retrieve location!";
+                }
             },
-            () => {
+            (error) => {
                 document.getElementById("errorMessage").textContent = "Location access denied!";
+                console.error("Geolocation error:", error);
             }
         );
     } else {
