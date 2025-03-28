@@ -4,18 +4,40 @@ const airQualityKey = "cf5e9dddc2888b05fc9113c54400f53a";
 let isCelsius = true;
 let lastSearchedCity = "";
 
-// Load last searched city on page load
-document.addEventListener("DOMContentLoaded", () => {
+// Ensure DOM is fully loaded before running script
+document.addEventListener("DOMContentLoaded", function() {
+    // Load last searched city
     let lastCity = localStorage.getItem("lastCity");
     if (lastCity) {
         document.getElementById("cityInput").value = lastCity;
         getWeather(lastCity);
     }
+
+    // Toggle temperature unit (°C / °F)
+    document.getElementById("unitToggle").addEventListener("change", function() {
+        isCelsius = !isCelsius;
+        let label = isCelsius ? "Switch to °F" : "Switch to °C";
+        this.nextElementSibling.textContent = label;
+
+        let city = document.getElementById("cityInput").value;
+        if (city) getWeather(city);
+    });
+
+    // Enable voice search
+    document.getElementById("voiceSearch").addEventListener("click", () => {
+        let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = "en-US";
+        recognition.start();
+        recognition.onresult = (event) => {
+            document.getElementById("cityInput").value = event.results[0][0].transcript;
+            getWeather(event.results[0][0].transcript);
+        };
+    });
 });
 
-// Fetch city list from OpenWeather API
+// Fetch city suggestions from OpenWeather API
 async function fetchCitySuggestions(query) {
-    if (query.length < 3) return; 
+    if (query.length < 3) return;
 
     const cityApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`;
 
@@ -42,13 +64,16 @@ document.getElementById("cityInput").addEventListener("input", function () {
     fetchCitySuggestions(this.value);
 });
 
+// Get weather data
 async function getWeather(city = null, lat = null, lon = null) {
-    if (city && city === lastSearchedCity) return;
-    lastSearchedCity = city;
+    if (!city && (lat === null || lon === null)) {
+        document.getElementById("errorMessage").textContent = "Please enter a city or enable location!";
+        return;
+    }
 
-    let url = city ? 
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric` : 
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+    let url = city 
+        ? `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric` 
+        : `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
 
     try {
         const response = await fetch(url);
@@ -58,7 +83,7 @@ async function getWeather(city = null, lat = null, lon = null) {
             displayWeather(data);
             getAQI(data.coord.lat, data.coord.lon);
             document.getElementById("errorMessage").textContent = "";
-            saveLastCity(city);
+            localStorage.setItem("lastCity", city);
         } else {
             document.getElementById("errorMessage").textContent = "City not found!";
         }
@@ -67,6 +92,23 @@ async function getWeather(city = null, lat = null, lon = null) {
     }
 }
 
+// Get user's location and fetch weather
+function getLocationWeather() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                getWeather(null, position.coords.latitude, position.coords.longitude);
+            },
+            () => {
+                document.getElementById("errorMessage").textContent = "Location access denied!";
+            }
+        );
+    } else {
+        document.getElementById("errorMessage").textContent = "Geolocation not supported!";
+    }
+}
+
+// Display weather details
 function displayWeather(data) {
     let temp = isCelsius ? data.main.temp : (data.main.temp * 9/5) + 32;
     let unit = isCelsius ? "°C" : "°F";
@@ -84,8 +126,11 @@ function displayWeather(data) {
     `;
 }
 
+// Fetch Air Quality Index (AQI)
 async function getAQI(lat, lon) {
-    const url = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${airQualityKey}`;
+    if (!lat || !lon) return;
+    
+    const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${airQualityKey}`;
 
     try {
         const response = await fetch(url);
