@@ -22,6 +22,7 @@ async function getWeather(city = null, lat = null, lon = null) {
         if (data.cod === 200) {
             displayWeather(data);
             getForecast(forecastUrl);
+            document.getElementById("errorMessage").textContent = ""; // ✅ Clear error message on success
         } else {
             document.getElementById("errorMessage").textContent = "City not found!";
         }
@@ -35,13 +36,12 @@ function displayWeather(data) {
     let unit = isCelsius ? "°C" : "°F";
     
     document.getElementById("weatherResult").innerHTML = `
-        <h2>${data.name}, ${data.sys.country}</h2>
+        <h2>${data.name}, ${data.sys.country}</h2> <!-- ✅ Now correctly updates location -->
         <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="Weather Icon">
         <p>Temperature: ${temp.toFixed(1)}${unit}</p>
         <p>Weather: ${data.weather[0].description} ⛅</p>
         <p>Humidity: ${data.main.humidity}%</p>
     `;
-    document.getElementById("errorMessage").textContent = "";
 }
 
 async function getForecast(url) {
@@ -108,3 +108,4 @@ document.getElementById("unitToggle").addEventListener("change", function() {
     let city = document.getElementById("cityInput").value;
     if (city) getWeather(city);
 });
+
