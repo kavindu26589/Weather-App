@@ -2,7 +2,7 @@
  * Replace "YOUR_OPENWEATHER_API_KEY" below with your actual
  * OpenWeather API key.
  **************************************************************/
-const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a";
+const apiKey = "YOUR_OPENWEATHER_API_KEY";
 const airQualityKey = apiKey; // Reuse the same key
 
 let isCelsius = true;
@@ -102,7 +102,7 @@ function initComparisonChart() {
   comparisonChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: [], // We'll fill this in dynamically
+      labels: [],
       datasets: []
     },
     options: {
@@ -318,7 +318,6 @@ function aggregateDailyForecast(forecastList) {
       }
       if (item.main.temp > dailyMap[dateKey].maxTemp) {
         dailyMap[dateKey].maxTemp = item.main.temp;
-        // could also update icon, but let's keep the earliest or last
       }
     }
   });
@@ -345,184 +344,8 @@ function displayForecast(dailyData) {
       unit = "°F";
     }
 
-    // Format date, e.g. "Fri, 28 Jul"
     const options = { weekday: "short", day: "numeric", month: "short" };
     const dateStr = day.date.toLocaleDateString(undefined, options);
 
     forecastDay.innerHTML = `
-      <p>${dateStr}</p>
-      <img src="https://openweathermap.org/img/wn/${day.icon}@2x.png" alt="Icon">
-      <p>${minTemp.toFixed(1)}${unit} / ${maxTemp.toFixed(1)}${unit}</p>
-      <p style="font-size: 0.9em; color: #555;">${day.description}</p>
-    `;
-    forecastContainer.appendChild(forecastDay);
-  });
-}
-
-/** =========================
- *   FAVORITES & MULTI-CITY
- *  ========================= */
-
-function loadFavorites() {
-  const stored = localStorage.getItem("favorites");
-  if (stored) {
-    favorites = JSON.parse(stored);
-  } else {
-    favorites = [];
-  }
-  renderFavorites();
-}
-
-function saveFavorites() {
-  localStorage.setItem("favorites", JSON.stringify(favorites));
-}
-
-function addToFavoritesList(cityName) {
-  // Check if already in favorites
-  const found = favorites.some(f => f.cityName.toLowerCase() === cityName.toLowerCase());
-  if (!found) {
-    favorites.push({ cityName, selected: false });
-    saveFavorites();
-    renderFavorites();
-  }
-}
-
-function toggleFavoriteSelection(cityName) {
-  favorites = favorites.map(f => {
-    if (f.cityName.toLowerCase() === cityName.toLowerCase()) {
-      return { ...f, selected: !f.selected };
-    }
-    return f;
-  });
-  saveFavorites();
-  renderFavorites();
-}
-
-function removeFavorite(cityName) {
-  favorites = favorites.filter(f => f.cityName.toLowerCase() !== cityName.toLowerCase());
-  saveFavorites();
-  renderFavorites();
-}
-
-function renderFavorites() {
-  const list = document.getElementById("favoritesList");
-  if (!list) return;
-  list.innerHTML = "";
-
-  favorites.forEach(f => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <label>
-        <input type="checkbox" ${f.selected ? "checked" : ""}/>
-        ${f.cityName}
-      </label>
-      <button class="removeFavBtn" style="margin-left:5px;">X</button>
-    `;
-    list.appendChild(li);
-
-    // Toggle selection
-    const checkbox = li.querySelector("input[type='checkbox']");
-    checkbox.addEventListener("change", () => {
-      toggleFavoriteSelection(f.cityName);
-    });
-
-    // Remove from favorites
-    const removeBtn = li.querySelector(".removeFavBtn");
-    removeBtn.addEventListener("click", () => {
-      removeFavorite(f.cityName);
-    });
-  });
-}
-
-/** =========================
- *   MULTI-CITY COMPARISON
- *  ========================= */
-
-async function buildComparisonChart(selectedFavorites) {
-  // Prepare chart data
-  initComparisonChart();
-
-  // For each favorite city, fetch forecast & compute daily average
-  const chartLabels = [];
-  let firstCity = true;
-
-  for (const fav of selectedFavorites) {
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(fav.cityName)}&appid=${apiKey}&units=metric`;
-    try {
-      const response = await fetch(forecastUrl);
-      const data = await response.json();
-      if (!data.list) continue;
-
-      // Aggregate daily min & max, then compute daily average
-      const dailyData = aggregateDailyForecast(data.list);
-      const cityDates = [];
-      const cityTemps = [];
-
-      dailyData.forEach(day => {
-        const avgTemp = (day.minTemp + day.maxTemp) / 2;
-        let finalTemp = avgTemp;
-        if (!isCelsius) {
-          finalTemp = (avgTemp * 9) / 5 + 32;
-        }
-        const options = { weekday: "short", day: "numeric", month: "short" };
-        const dateStr = day.date.toLocaleDateString(undefined, options);
-
-        cityDates.push(dateStr);
-        cityTemps.push(finalTemp.toFixed(1));
-      });
-
-      // If first city, set the chart labels
-      if (firstCity) {
-        comparisonChart.data.labels = cityDates;
-        firstCity = false;
-      }
-
-      // Add dataset for this city
-      comparisonChart.data.datasets.push({
-        label: fav.cityName,
-        data: cityTemps,
-        borderColor: getRandomColor(),
-        fill: false
-      });
-
-    } catch (error) {
-      console.error("Error fetching city forecast for comparison:", error);
-    }
-  }
-
-  comparisonChart.update();
-}
-
-function initComparisonChart() {
-  const ctx = document.getElementById("comparisonChart").getContext("2d");
-  if (comparisonChart) {
-    comparisonChart.destroy(); // If there's an old chart, destroy it
-  }
-  comparisonChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: [],
-      datasets: []
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: false,
-          title: {
-            display: true,
-            text: isCelsius ? "Temperature (°C)" : "Temperature (°F)"
-          }
-        }
-      }
-    }
-  });
-}
-
-/** Generate a random color for each dataset */
-function getRandomColor() {
-  const r = Math.floor(Math.random() * 200);
-  const g = Math.floor(Math.random() * 200);
-  const b = Math.floor(Math.random() * 200);
-  return `rgb(${r}, ${g}, ${b})`;
-}
+      <p>${dateStr}</p
