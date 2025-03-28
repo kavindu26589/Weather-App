@@ -2,7 +2,7 @@
  * Replace "YOUR_OPENWEATHER_API_KEY" below with your actual
  * OpenWeather API key.
  **************************************************************/
-const apiKey = "YOUR_OPENWEATHER_API_KEY";
+const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a";
 const airQualityKey = apiKey; // Reuse the same key
 
 let isCelsius = true;
