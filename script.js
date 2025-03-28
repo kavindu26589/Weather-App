@@ -1,4 +1,5 @@
 const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; // Replace with your API key 
+const apiKey = "YOUR_OPENWEATHER_API_KEY"; 
 const airQualityKey = apiKey;  // Reuse the same key
 
 let isCelsius = true;
@@ -79,7 +80,11 @@ async function getWeather(city = null, lat = null, lon = null) {
     let url;
     if (city) {
         // **Fix City Formatting for API**
-        city = city.trim().split(",")[0]; // Remove country code for API request
+        city = city.trim().split(",")[0]; // Remove country code and trim input
+        if (city === "") {
+            document.getElementById("errorMessage").textContent = "City name cannot be empty!";
+            return;
+        }
         url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
     } else if (lat !== null && lon !== null) {
         url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
@@ -100,7 +105,7 @@ async function getWeather(city = null, lat = null, lon = null) {
             localStorage.setItem("lastCity", city);
         } else {
             console.error("Weather API Error Response:", data);
-            document.getElementById("errorMessage").textContent = `City not found! (${data.message})`;
+            document.getElementById("errorMessage").textContent = `Error: ${data.message}`;
         }
     } catch (error) {
         document.getElementById("errorMessage").textContent = "Error fetching weather data.";
