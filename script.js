@@ -13,6 +13,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// Fetch city list from OpenWeather API
+async function fetchCitySuggestions(query) {
+    if (query.length < 3) return; 
+
+    const cityApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`;
+
+    try {
+        const response = await fetch(cityApiUrl);
+        const cities = await response.json();
+
+        let datalist = document.getElementById("citySuggestions");
+        datalist.innerHTML = "";
+
+        cities.forEach(city => {
+            let option = document.createElement("option");
+            option.value = `${city.name}, ${city.country}`;
+            datalist.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("City suggestion error:", error);
+    }
+}
+
+// Listen for user typing in city input
+document.getElementById("cityInput").addEventListener("input", function () {
+    fetchCitySuggestions(this.value);
+});
+
 async function getWeather(city = null, lat = null, lon = null) {
     if (city && city === lastSearchedCity) return;
     lastSearchedCity = city;
@@ -42,11 +71,6 @@ function displayWeather(data) {
     let temp = isCelsius ? data.main.temp : (data.main.temp * 9/5) + 32;
     let unit = isCelsius ? "°C" : "°F";
 
-    document.body.style.background = 
-        data.weather[0].main.includes("Clear") ? "#ffcc33" :
-        data.weather[0].main.includes("Clouds") ? "#bdc3c7" :
-        data.weather[0].main.includes("Rain") ? "#4a90e2" : "#0072ff";
-
     document.getElementById("weatherResult").innerHTML = `
         <h2>${data.name}, ${data.sys.country}</h2>
         <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png">
@@ -73,13 +97,3 @@ async function getAQI(lat, lon) {
         console.error("AQI fetch error:", error);
     }
 }
-
-document.getElementById("voiceSearch").addEventListener("click", () => {
-    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "en-US";
-    recognition.start();
-    recognition.onresult = (event) => {
-        document.getElementById("cityInput").value = event.results[0][0].transcript;
-        getWeather(event.results[0][0].transcript);
-    };
-});
