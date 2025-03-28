@@ -1,4 +1,5 @@
 const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; // Replace with your API key 
+const apiKey = "YOUR_OPENWEATHER_API_KEY"; 
 const airQualityKey = apiKey;  // Reuse the same key
 
 let isCelsius = true;
@@ -98,6 +99,8 @@ async function getWeather(city = null, lat = null, lon = null) {
         const response = await fetch(url);
         const data = await response.json();
 
+        console.log("API Response:", data); // Debugging Log to check API response
+
         if (response.ok) {
             displayWeather(data);
             getAQI(data.coord.lat, data.coord.lon);
@@ -112,29 +115,13 @@ async function getWeather(city = null, lat = null, lon = null) {
     }
 }
 
-// Get user's location and fetch weather
-function getLocationWeather() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                if (position.coords.latitude && position.coords.longitude) {
-                    getWeather(null, position.coords.latitude, position.coords.longitude);
-                } else {
-                    document.getElementById("errorMessage").textContent = "Unable to retrieve location!";
-                }
-            },
-            (error) => {
-                document.getElementById("errorMessage").textContent = "Location access denied!";
-                console.error("Geolocation error:", error);
-            }
-        );
-    } else {
-        document.getElementById("errorMessage").textContent = "Geolocation not supported!";
-    }
-}
-
 // Display weather details
 function displayWeather(data) {
+    if (!data || !data.main || !data.weather) {
+        document.getElementById("errorMessage").textContent = "Weather data not available!";
+        return;
+    }
+
     let temp = isCelsius ? data.main.temp : (data.main.temp * 9/5) + 32;
     let unit = isCelsius ? "°C" : "°F";
 
