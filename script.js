@@ -78,12 +78,7 @@ async function getWeather(city = null, lat = null, lon = null) {
 
     let url;
     if (city) {
-        // **Fix City Formatting for API**
-        city = city.trim().split(",")[0]; // Remove country code and trim input
-        if (city === "") {
-            document.getElementById("errorMessage").textContent = "City name cannot be empty!";
-            return;
-        }
+        city = city.trim().split(",")[0]; // Remove country code
         url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
     } else if (lat !== null && lon !== null) {
         url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
@@ -97,8 +92,6 @@ async function getWeather(city = null, lat = null, lon = null) {
     try {
         const response = await fetch(url);
         const data = await response.json();
-
-        console.log("API Response:", data); // Debugging Log to check API response
 
         if (response.ok) {
             displayWeather(data);
