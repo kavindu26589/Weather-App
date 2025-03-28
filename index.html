@@ -9,7 +9,8 @@
 <body>
     <div class="container">
         <h1>🌤️ Weather App</h1>
-        <input type="text" id="cityInput" placeholder="Enter city name">
+        <input type="text" id="cityInput" placeholder="Enter city name" list="citySuggestions">
+        <datalist id="citySuggestions"></datalist>
         <button onclick="getWeather()">Get Weather</button>
         <button onclick="getLocationWeather()">📍 Use My Location</button>
         <button id="voiceSearch">🎤 Speak</button>
