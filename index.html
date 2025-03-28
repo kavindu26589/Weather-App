@@ -12,14 +12,19 @@
         <input type="text" id="cityInput" placeholder="Enter city name">
         <button onclick="getWeather()">Get Weather</button>
         <button onclick="getLocationWeather()">📍 Use My Location</button>
+        <button id="voiceSearch">🎤 Speak</button>
         <div id="weatherResult"></div>
         <p id="errorMessage" class="error"></p>
         <div class="toggle">
             <input type="checkbox" id="unitToggle">
             <label for="unitToggle">Switch to °F</label>
         </div>
+        <h2>Air Quality Index (AQI)</h2>
+        <div id="aqiResult"></div>
         <h2>7-Day Forecast</h2>
         <div id="forecast"></div>
+        <h2>City Map</h2>
+        <div id="map"></div>
     </div>
     <script src="script.js"></script>
 </body>
