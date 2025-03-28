@@ -32,13 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-// **Debounce Function to Limit API Calls**
-let debounceTimer;
-function debounce(func, delay) {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(func, delay);
-}
-
 // Fetch city suggestions from OpenWeather API
 async function fetchCitySuggestions(query) {
     if (query.length < 3) return;
@@ -63,7 +56,13 @@ async function fetchCitySuggestions(query) {
     }
 }
 
-// **Debounced Input Listener**
+// **Debounce API Calls**
+let debounceTimer;
+function debounce(func, delay) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(func, delay);
+}
+
 document.getElementById("cityInput").addEventListener("input", function () {
     debounce(() => fetchCitySuggestions(this.value), 500);
 });
@@ -79,7 +78,7 @@ async function getWeather(city = null, lat = null, lon = null) {
 
     let url;
     if (city) {
-        // **Fix city formatting for API**
+        // **Fix City Formatting for API**
         city = city.trim().split(",")[0]; // Remove country code for API request
         url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
     } else if (lat !== null && lon !== null) {
@@ -88,6 +87,8 @@ async function getWeather(city = null, lat = null, lon = null) {
         console.error("Invalid API call: No city or coordinates provided");
         return;
     }
+
+    console.log("Fetching Weather Data:", url); // Debugging Log
 
     try {
         const response = await fetch(url);
@@ -98,6 +99,7 @@ async function getWeather(city = null, lat = null, lon = null) {
             getAQI(data.coord.lat, data.coord.lon);
             localStorage.setItem("lastCity", city);
         } else {
+            console.error("Weather API Error Response:", data);
             document.getElementById("errorMessage").textContent = `City not found! (${data.message})`;
         }
     } catch (error) {
@@ -161,4 +163,3 @@ async function getAQI(lat, lon) {
         console.error("AQI fetch error:", error);
     }
 }
-
