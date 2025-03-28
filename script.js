@@ -1,8 +1,7 @@
-/*******************************************************
- * 1) Replace "6d0b5a223205f8e88b2b9d45a0ad532a" below.
- * 2) Ensure One Call (v2.5) is enabled in your
- *    OpenWeather account (for 7-day forecast).
- *******************************************************/
+/**************************************************************
+ * Replace "YOUR_OPENWEATHER_API_KEY" below with your actual
+ * OpenWeather API key.
+ **************************************************************/
 const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a";
 const airQualityKey = apiKey; // Reuse the same key
 
@@ -160,7 +159,7 @@ function calculateWindDirection(deg) {
 }
 
 /**
- * Format a Unix timestamp into a local time string (e.g. "6:15 AM").
+ * Format a Unix timestamp into local time string (e.g. "6:15 AM").
  */
 function formatTime(unixTime) {
   if (!unixTime) return "";
@@ -223,8 +222,7 @@ function aggregateDailyForecast(forecastList) {
 
   forecastList.forEach(item => {
     const dateObj = new Date(item.dt * 1000);
-    // e.g. "2023-07-14"
-    const dateKey = dateObj.toISOString().split("T")[0];
+    const dateKey = dateObj.toISOString().split("T")[0]; // e.g. "2023-07-14"
 
     if (!dailyMap[dateKey]) {
       dailyMap[dateKey] = {
@@ -238,22 +236,22 @@ function aggregateDailyForecast(forecastList) {
       // Update min & max
       if (item.main.temp < dailyMap[dateKey].minTemp) {
         dailyMap[dateKey].minTemp = item.main.temp;
-        dailyMap[dateKey].icon = item.weather[0].icon; // or pick the earliest icon
+        dailyMap[dateKey].icon = item.weather[0].icon; 
       }
       if (item.main.temp > dailyMap[dateKey].maxTemp) {
         dailyMap[dateKey].maxTemp = item.main.temp;
-        // could also update icon, but let's keep the first
+        // Could also update icon, but let's keep the earliest
       }
     }
   });
 
-  // Convert dailyMap to an array, sort by date, and limit to 5 days
+  // Convert dailyMap to array, sort by date, limit to 5 days
   const dailyArray = Object.values(dailyMap).sort((a, b) => a.date - b.date);
   return dailyArray.slice(0, 5);
 }
 
 /**
- * Display the aggregated 5-day forecast in #forecast.
+ * Display the aggregated 5-day forecast in #forecast, single row with horizontal scroll.
  */
 function displayForecast(dailyData) {
   const forecastContainer = document.getElementById("forecast");
@@ -273,15 +271,14 @@ function displayForecast(dailyData) {
       unit = "°F";
     }
 
-    // Format date (e.g., "Mon 27")
-    const options = { weekday: "short", day: "numeric" };
+    // Format date (e.g., "Fri, 28 Jul")
+    const options = { weekday: "short", day: "numeric", month: "short" };
     const dateStr = day.date.toLocaleDateString(undefined, options);
 
     forecastDay.innerHTML = `
       <p>${dateStr}</p>
       <img src="https://openweathermap.org/img/wn/${day.icon}@2x.png" alt="Forecast Icon">
-      <p>Min: ${minTemp.toFixed(1)}${unit}</p>
-      <p>Max: ${maxTemp.toFixed(1)}${unit}</p>
+      <p>${minTemp.toFixed(1)}${unit} / ${maxTemp.toFixed(1)}${unit}</p>
     `;
     forecastContainer.appendChild(forecastDay);
   });
