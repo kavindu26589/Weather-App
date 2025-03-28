@@ -1,4 +1,4 @@
-const apiKey = "cf5e9dddc2888b05fc9113c54400f53a"; 
+const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; 
 const airQualityKey = apiKey;  // Reuse the same key
 
 let isCelsius = true;
@@ -8,13 +8,16 @@ const defaultCity = "Colombo"; // Fixed to Colombo
 document.addEventListener("DOMContentLoaded", function() {
     getWeather(defaultCity);
 
-    document.getElementById("unitToggle").addEventListener("change", function() {
-        isCelsius = !isCelsius;
-        let label = isCelsius ? "Switch to °F" : "Switch to °C";
-        this.nextElementSibling.textContent = label;
+    const unitToggle = document.getElementById("unitToggle");
+    if (unitToggle) {
+        unitToggle.addEventListener("change", function() {
+            isCelsius = !isCelsius;
+            let label = isCelsius ? "Switch to °F" : "Switch to °C";
+            this.nextElementSibling.textContent = label;
 
-        getWeather(defaultCity);
-    });
+            getWeather(defaultCity);
+        });
+    }
 });
 
 // Fetch weather data for Colombo
