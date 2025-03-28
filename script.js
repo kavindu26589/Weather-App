@@ -7,13 +7,13 @@ const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a";
 const airQualityKey = apiKey; // Reuse the same key
 
 let isCelsius = true;
-const defaultCity = "Colombo"; // Always show Colombo's weather
+const defaultCity = "Colombo"; // Fixed to Colombo
 
 document.addEventListener("DOMContentLoaded", function () {
-  // On page load, fetch Colombo weather
+  // Fetch current weather for Colombo on page load.
   getWeather(defaultCity);
 
-  // Setup °C/°F toggle
+  // Set up the °C/°F toggle.
   const unitToggle = document.getElementById("unitToggle");
   if (unitToggle) {
     unitToggle.addEventListener("change", function () {
@@ -22,15 +22,15 @@ document.addEventListener("DOMContentLoaded", function () {
       if (labelElement) {
         labelElement.textContent = isCelsius ? "Switch to °F" : "Switch to °C";
       }
-      // Re-fetch weather & forecast with new unit
+      // Re-fetch weather, AQI, and forecast with the new unit.
       getWeather(defaultCity);
     });
   }
 });
 
 /**
- * Fetch current weather for 'city' (Colombo).
- * Then fetch forecast & AQI using lat/lon.
+ * Fetch current weather for the given city.
+ * Then fetch AQI and forecast using the obtained coordinates.
  */
 async function getWeather(city) {
   const errorMessageEl = document.getElementById("errorMessage");
@@ -62,7 +62,7 @@ async function getWeather(city) {
 }
 
 /**
- * Display current weather in #weatherResult
+ * Display current weather information in #weatherResult.
  */
 function displayWeather(data) {
   const weatherResult = document.getElementById("weatherResult");
@@ -82,7 +82,7 @@ function displayWeather(data) {
     <p>Humidity: ${data.main.humidity}%</p>
   `;
 
-  // Show map
+  // Display map using the provided coordinates.
   const mapDiv = document.getElementById("map");
   if (mapDiv) {
     mapDiv.innerHTML = `
@@ -96,11 +96,10 @@ function displayWeather(data) {
 }
 
 /**
- * Fetch Air Quality Index (AQI) data
+ * Fetch Air Quality Index (AQI) using latitude and longitude.
  */
 async function getAQI(lat, lon) {
   if (!lat || !lon) return;
-
   const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${airQualityKey}`;
   try {
     const response = await fetch(url);
@@ -116,27 +115,31 @@ async function getAQI(lat, lon) {
 }
 
 /**
- * Fetch 7-Day Forecast using One Call (v2.5) API
+ * Fetch 5-Day/3-Hour Forecast using OpenWeather's forecast endpoint.
+ * We filter for forecasts at 12:00:00 to represent each day.
  */
 async function getForecast(lat, lon) {
   if (!lat || !lon) return;
-
-  // Exclude other data if you only want daily
-  // Here we exclude current,minutely,hourly,alerts
-  const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly,alerts&units=metric&appid=${apiKey}`;
+  const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
   console.log("Fetching Forecast Data:", url);
 
   try {
     const response = await fetch(url);
     const data = await response.json();
 
-    // Log entire forecast data for debugging
+    // Log response for debugging.
     console.log("Forecast API response:", data);
 
-    if (data.daily) {
-      displayForecast(data.daily);
+    if (data.list && data.list.length > 0) {
+      // Filter forecasts for 12:00:00 each day.
+      const dailyForecasts = data.list.filter(forecast => forecast.dt_txt.includes("12:00:00"));
+      if (dailyForecasts.length > 0) {
+        displayForecast(dailyForecasts);
+      } else {
+        console.error("No daily forecast entries found for 12:00:00", data);
+      }
     } else {
-      console.error("No 'daily' data in forecast response!", data);
+      console.error("Forecast API response does not contain a list.", data);
     }
   } catch (error) {
     console.error("Forecast fetch error:", error);
@@ -144,38 +147,35 @@ async function getForecast(lat, lon) {
 }
 
 /**
- * Display 7-Day Forecast in #forecast
+ * Display forecast cards in #forecast.
  */
 function displayForecast(dailyData) {
   const forecastContainer = document.getElementById("forecast");
   if (!forecastContainer) return;
   forecastContainer.innerHTML = "";
 
-  // Show next 7 days (including today).
-  dailyData.slice(0, 7).forEach((day) => {
+  dailyData.forEach(forecast => {
     const forecastDay = document.createElement("div");
     forecastDay.classList.add("forecast-day");
 
-    // Convert temps if user toggled to °F
-    let dayTemp = day.temp.day;
-    let nightTemp = day.temp.night;
+    let dayTemp = forecast.main.temp;
+    let unit = "°C";
     if (!isCelsius) {
       dayTemp = (dayTemp * 9) / 5 + 32;
-      nightTemp = (nightTemp * 9) / 5 + 32;
+      unit = "°F";
     }
-    const unit = isCelsius ? "°C" : "°F";
 
     // Format the date (e.g., "Mon 27")
-    const dateObj = new Date(day.dt * 1000);
+    const dateObj = new Date(forecast.dt * 1000);
     const options = { weekday: "short", day: "numeric" };
     const dateStr = dateObj.toLocaleDateString(undefined, options);
 
     forecastDay.innerHTML = `
       <p>${dateStr}</p>
-      <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" alt="Forecast Icon">
-      <p>Day: ${dayTemp.toFixed(1)}${unit}</p>
-      <p>Night: ${nightTemp.toFixed(1)}${unit}</p>
+      <img src="https://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png" alt="Forecast Icon">
+      <p>${dayTemp.toFixed(1)}${unit}</p>
     `;
     forecastContainer.appendChild(forecastDay);
   });
 }
+
