@@ -1,10 +1,11 @@
-/***********************************************
- * 1) Replace "YOUR_OPENWEATHER_API_KEY" below
- * 2) Ensure One Call API is enabled in your
- *    OpenWeather account
- ***********************************************/
+/*******************************************************
+ * 1) Replace "6d0b5a223205f8e88b2b9d45a0ad532a" below.
+ * 2) Ensure One Call (v2.5) is enabled in your
+ *    OpenWeather account (for 7-day forecast).
+ *******************************************************/
 const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; 
-const airQualityKey = apiKey;  // Reuse the same key
+const airQualityKey = apiKey; // Reuse the same key
+
 let isCelsius = true;
 const defaultCity = "Colombo"; // Always show Colombo's weather
 
@@ -12,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // On page load, fetch Colombo weather
   getWeather(defaultCity);
 
-  // Setup the °C/°F toggle
+  // Setup °C/°F toggle
   const unitToggle = document.getElementById("unitToggle");
   if (unitToggle) {
     unitToggle.addEventListener("change", function () {
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (labelElement) {
         labelElement.textContent = isCelsius ? "Switch to °F" : "Switch to °C";
       }
-      // Re-fetch weather & forecast with the new unit
+      // Re-fetch weather & forecast with new unit
       getWeather(defaultCity);
     });
   }
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /**
  * Fetch current weather for 'city' (Colombo).
- * Then fetch forecast & AQI using the lat/lon.
+ * Then fetch forecast & AQI using lat/lon.
  */
 async function getWeather(city) {
   const errorMessageEl = document.getElementById("errorMessage");
@@ -81,7 +82,7 @@ function displayWeather(data) {
     <p>Humidity: ${data.main.humidity}%</p>
   `;
 
-  // Display map
+  // Show map
   const mapDiv = document.getElementById("map");
   if (mapDiv) {
     mapDiv.innerHTML = `
@@ -99,6 +100,7 @@ function displayWeather(data) {
  */
 async function getAQI(lat, lon) {
   if (!lat || !lon) return;
+
   const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${airQualityKey}`;
   try {
     const response = await fetch(url);
@@ -114,12 +116,13 @@ async function getAQI(lat, lon) {
 }
 
 /**
- * Fetch 7-Day Forecast using One Call API
+ * Fetch 7-Day Forecast using One Call (v2.5) API
  */
 async function getForecast(lat, lon) {
   if (!lat || !lon) return;
 
   // Exclude other data if you only want daily
+  // Here we exclude current,minutely,hourly,alerts
   const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly,alerts&units=metric&appid=${apiKey}`;
   console.log("Fetching Forecast Data:", url);
 
@@ -127,8 +130,13 @@ async function getForecast(lat, lon) {
     const response = await fetch(url);
     const data = await response.json();
 
+    // Log entire forecast data for debugging
+    console.log("Forecast API response:", data);
+
     if (data.daily) {
       displayForecast(data.daily);
+    } else {
+      console.error("No 'daily' data in forecast response!", data);
     }
   } catch (error) {
     console.error("Forecast fetch error:", error);
@@ -143,9 +151,8 @@ function displayForecast(dailyData) {
   if (!forecastContainer) return;
   forecastContainer.innerHTML = "";
 
-  // We'll show the next 7 days (including today).
-  // If you want to skip today's forecast, do dailyData.slice(1, 8).
-  dailyData.slice(0, 7).forEach((day, index) => {
+  // Show next 7 days (including today).
+  dailyData.slice(0, 7).forEach((day) => {
     const forecastDay = document.createElement("div");
     forecastDay.classList.add("forecast-day");
 
@@ -158,7 +165,7 @@ function displayForecast(dailyData) {
     }
     const unit = isCelsius ? "°C" : "°F";
 
-    // Format the date (e.g. "Mon, 27")
+    // Format the date (e.g., "Mon 27")
     const dateObj = new Date(day.dt * 1000);
     const options = { weekday: "short", day: "numeric" };
     const dateStr = dateObj.toLocaleDateString(undefined, options);
