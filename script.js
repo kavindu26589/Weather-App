@@ -6,14 +6,15 @@ const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a";
 const airQualityKey = apiKey; // Reuse the same key
 
 let isCelsius = true;
-const defaultCity = "Colombo"; // Always show Colombo
+// Default city on page load
+const defaultCity = "Colombo";
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Fetch Colombo's weather on page load
+  // Show spinner and fetch default city's weather on page load
   showSpinner(true);
   getWeather(defaultCity);
 
-  // Setup the °C/°F toggle
+  // °C/°F toggle
   const unitToggle = document.getElementById("unitToggle");
   if (unitToggle) {
     unitToggle.addEventListener("change", function () {
@@ -23,7 +24,21 @@ document.addEventListener("DOMContentLoaded", function () {
         labelElement.textContent = isCelsius ? "Switch to °F" : "Switch to °C";
       }
       showSpinner(true);
-      getWeather(defaultCity);
+      // Re-fetch weather for current city (or default if none searched)
+      const city = document.getElementById("cityInput").value.trim() || defaultCity;
+      getWeather(city);
+    });
+  }
+
+  // Search button for user-input city
+  const searchBtn = document.getElementById("searchBtn");
+  if (searchBtn) {
+    searchBtn.addEventListener("click", function () {
+      const cityInput = document.getElementById("cityInput").value.trim();
+      if (cityInput) {
+        showSpinner(true);
+        getWeather(cityInput);
+      }
     });
   }
 });
@@ -39,7 +54,7 @@ function showSpinner(visible) {
 }
 
 /**
- * Fetch current weather data for the city.
+ * Fetch current weather data for the given city.
  * Then fetch AQI and 5-day forecast using the coordinates.
  */
 async function getWeather(city) {
@@ -240,7 +255,6 @@ function aggregateDailyForecast(forecastList) {
       }
       if (item.main.temp > dailyMap[dateKey].maxTemp) {
         dailyMap[dateKey].maxTemp = item.main.temp;
-        // Could also update icon, but let's keep the earliest
       }
     }
   });
