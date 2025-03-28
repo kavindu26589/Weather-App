@@ -2,73 +2,24 @@ const apiKey = "cf5e9dddc2888b05fc9113c54400f53a";
 const airQualityKey = apiKey;  // Reuse the same key
 
 let isCelsius = true;
+const defaultCity = "Colombo"; // Fixed to Colombo
 
 // Ensure DOM is fully loaded before running script
 document.addEventListener("DOMContentLoaded", function() {
-    let lastCity = localStorage.getItem("lastCity");
-    if (lastCity) {
-        document.getElementById("cityInput").value = lastCity;
-        getWeather(lastCity);
-    }
+    getWeather(defaultCity);
 
     document.getElementById("unitToggle").addEventListener("change", function() {
         isCelsius = !isCelsius;
         let label = isCelsius ? "Switch to °F" : "Switch to °C";
         this.nextElementSibling.textContent = label;
 
-        let city = document.getElementById("cityInput").value;
-        if (city) getWeather(city);
-    });
-
-    document.getElementById("voiceSearch").addEventListener("click", () => {
-        let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = "en-US";
-        recognition.start();
-        recognition.onresult = (event) => {
-            document.getElementById("cityInput").value = event.results[0][0].transcript;
-            getWeather(event.results[0][0].transcript);
-        };
+        getWeather(defaultCity);
     });
 });
 
-// Fetch city suggestions from OpenWeather API
-async function fetchCitySuggestions(query) {
-    if (query.length < 3) return;
-
-    const cityApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${apiKey}`;
-
-    try {
-        const response = await fetch(cityApiUrl);
-        const cities = await response.json();
-
-        let datalist = document.getElementById("citySuggestions");
-        datalist.innerHTML = "";
-
-        cities.forEach(city => {
-            let option = document.createElement("option");
-            option.value = `${city.name}, ${city.country}`;
-            datalist.appendChild(option);
-        });
-
-    } catch (error) {
-        console.error("City suggestion error:", error);
-    }
-}
-
-document.getElementById("cityInput").addEventListener("input", function () {
-    fetchCitySuggestions(this.value);
-});
-
-// Get weather data
-async function getWeather(city = null) {
+// Fetch weather data for Colombo
+async function getWeather(city) {
     document.getElementById("errorMessage").textContent = ""; 
-
-    if (!city) {
-        document.getElementById("errorMessage").textContent = "Please enter a valid city!";
-        return;
-    }
-
-    city = city.trim().split(",")[0]; // Remove country code
 
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
 
@@ -81,7 +32,6 @@ async function getWeather(city = null) {
         if (response.ok) {
             displayWeather(data);
             getAQI(data.coord.lat, data.coord.lon);
-            localStorage.setItem("lastCity", city);
         } else {
             console.error("Weather API Error Response:", data);
             document.getElementById("errorMessage").textContent = `Error: ${data.message}`;
@@ -108,4 +58,21 @@ function displayWeather(data) {
     document.getElementById("map").innerHTML = `
         <iframe width="100%" height="200" src="https://maps.google.com/maps?q=${data.coord.lat},${data.coord.lon}&z=10&output=embed"></iframe>
     `;
+}
+
+// Fetch Air Quality Index (AQI)
+async function getAQI(lat, lon) {
+    if (!lat || !lon) return;
+    
+    const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${airQualityKey}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const aqi = data.list[0].main.aqi;
+
+        document.getElementById("aqiResult").innerHTML = `<p>Air Quality Index: ${aqi} (1-Good, 5-Very Poor)</p>`;
+    } catch (error) {
+        console.error("AQI fetch error:", error);
+    }
 }
