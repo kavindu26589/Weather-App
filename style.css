@@ -9,9 +9,9 @@ body {
 }
 
 .container {
-  margin: 50px auto;
+  margin: 30px auto;
   width: 90%;
-  max-width: 400px;
+  max-width: 600px;
   background: white;
   padding: 20px;
   border-radius: 12px;
@@ -19,7 +19,6 @@ body {
   position: relative;
 }
 
-/* Loading Spinner */
 .spinner {
   position: fixed;
   top: 50%;
@@ -35,6 +34,7 @@ body {
 
 h1 {
   font-size: 24px;
+  margin-bottom: 15px;
 }
 
 .error {
@@ -42,17 +42,49 @@ h1 {
   font-weight: bold;
 }
 
-.toggle {
+.search-bar {
+  margin-bottom: 15px;
+}
+
+.search-bar input {
+  padding: 8px;
+  width: 60%;
+  max-width: 250px;
+  margin-right: 5px;
+}
+
+.search-bar button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.favorites {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.favorites h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.favorites ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 300px;
+  text-align: left;
+}
+
+.favorites li {
+  margin: 5px 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 15px;
-  font-size: 14px;
+  justify-content: space-between;
 }
 
 #map {
-  height: 200px;
+  height: 300px;
   margin-top: 10px;
   border-radius: 10px;
 }
@@ -60,16 +92,16 @@ h1 {
 /* Forecast Container: single row with horizontal scroll */
 #forecast {
   display: flex;
-  flex-wrap: nowrap;    /* Keep all cards in one row */
-  overflow-x: auto;     /* Enable horizontal scrolling if needed */
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 8px;
   margin-top: 10px;
 }
 
 /* Each Forecast Card */
 .forecast-day {
-  flex: 0 0 auto;       /* Don’t shrink or grow: keep natural size */
-  width: 80px;          /* Slightly wider to accommodate min/max on one line */
+  flex: 0 0 auto;
+  width: 90px;
   background: rgba(255, 255, 255, 0.9);
   padding: 10px;
   border-radius: 10px;
@@ -83,7 +115,20 @@ h1 {
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 500px) {
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+#comparisonChart {
+  margin-top: 20px;
+}
+
+@media (max-width: 700px) {
   .container {
     width: 95%;
   }
