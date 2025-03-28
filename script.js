@@ -1,6 +1,4 @@
-const apiKey = "9802ae2878f97feedd77543a7f635d72"; // Get your API key from https://openweathermap.org/api
-
-const apiKey = "YOUR_OPENWEATHER_API_KEY"; // Replace with your API key
+const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; // Replace with your API key
 let isCelsius = true;
 
 async function getWeather(city = null, lat = null, lon = null) {
