@@ -1,5 +1,5 @@
-const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; // Replace with your API key
-const airQualityKey = "cf5e9dddc2888b05fc9113c54400f53a"; 
+const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; // Replace with your API key 
+const airQualityKey = apiKey;  // Reuse the same key
 
 let isCelsius = true;
 let lastSearchedCity = "";
@@ -32,11 +32,18 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+// **Debounce Function to Limit API Calls**
+let debounceTimer;
+function debounce(func, delay) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(func, delay);
+}
+
 // Fetch city suggestions from OpenWeather API
 async function fetchCitySuggestions(query) {
-    if (query.length < 3) return; 
+    if (query.length < 3) return;
 
-    const cityApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`;
+    const cityApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${apiKey}`;
 
     try {
         const response = await fetch(cityApiUrl);
@@ -56,14 +63,14 @@ async function fetchCitySuggestions(query) {
     }
 }
 
-// Listen for user typing in city input
+// **Debounced Input Listener**
 document.getElementById("cityInput").addEventListener("input", function () {
-    fetchCitySuggestions(this.value);
+    debounce(() => fetchCitySuggestions(this.value), 500);
 });
 
 // Get weather data
 async function getWeather(city = null, lat = null, lon = null) {
-    document.getElementById("errorMessage").textContent = ""; // Clear previous errors
+    document.getElementById("errorMessage").textContent = ""; 
 
     if (!city && (lat === null || lon === null)) {
         document.getElementById("errorMessage").textContent = "Please enter a valid city or enable location!";
@@ -72,6 +79,8 @@ async function getWeather(city = null, lat = null, lon = null) {
 
     let url;
     if (city) {
+        // **Fix city formatting for API**
+        city = city.trim().split(",")[0]; // Remove country code for API request
         url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
     } else if (lat !== null && lon !== null) {
         url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
@@ -152,3 +161,4 @@ async function getAQI(lat, lon) {
         console.error("AQI fetch error:", error);
     }
 }
+
