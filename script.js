@@ -1,5 +1,4 @@
-const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; // Replace with your API key 
-const apiKey = "YOUR_OPENWEATHER_API_KEY"; 
+const apiKey = "cf5e9dddc2888b05fc9113c54400f53a"; // Replace with your API key 
 const airQualityKey = apiKey;  // Reuse the same key
 
 let isCelsius = true;
