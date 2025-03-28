@@ -3,7 +3,7 @@
  * 2) Ensure One Call (v2.5) is enabled in your
  *    OpenWeather account (for 7-day forecast).
  *******************************************************/
-const apiKey = "6d0b5a223205f8e88b2b9d45a0ad532a"; 
+const apiKey = "cf5e9dddc2888b05fc9113c54400f53a"; 
 const airQualityKey = apiKey; // Reuse the same key
 
 let isCelsius = true;
