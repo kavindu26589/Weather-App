@@ -2,21 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Colombo Weather</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="container">
     <h1>🌤️ Colombo Weather</h1>
     <p id="errorMessage" class="error"></p>
+    
+    <!-- Current Weather -->
     <div id="weatherResult"></div>
+    
+    <!-- Toggle for °C / °F -->
     <div class="toggle">
       <input type="checkbox" id="unitToggle" />
       <label for="unitToggle">Switch to °F</label>
     </div>
+    
+    <!-- Air Quality -->
     <h2>Air Quality Index (AQI)</h2>
     <div id="aqiResult"></div>
+    
+    <!-- 7-Day Forecast -->
+    <h2>7-Day Forecast</h2>
+    <div id="forecast"></div>
+    
+    <!-- City Map -->
     <h2>City Map</h2>
     <div id="map"></div>
   </div>
