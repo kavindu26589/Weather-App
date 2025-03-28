@@ -1,4 +1,3 @@
-/* General Styling */
 body {
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #00c6ff, #0072ff);
@@ -7,7 +6,6 @@ body {
     padding: 0;
 }
 
-/* Main Container */
 .container {
     margin: 50px auto;
     width: 90%;
@@ -18,22 +16,10 @@ body {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Heading */
 h1 {
     font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
 }
 
-/* Weather Icons in Title */
-h1::before {
-    content: "🌤️";
-    font-size: 1.5em;
-}
-
-/* Input Field */
 input {
     width: 80%;
     padding: 10px;
@@ -43,7 +29,6 @@ input {
     font-size: 16px;
 }
 
-/* Buttons */
 button {
     background: #007BFF;
     color: white;
@@ -53,41 +38,18 @@ button {
     cursor: pointer;
     border-radius: 5px;
     font-size: 16px;
-    transition: 0.3s ease-in-out;
+    transition: 0.3s;
 }
 
 button:hover {
     background: #0056b3;
 }
 
-button:nth-child(2) { /* Location Button */
-    background: #ff2e63;
-}
-
-button:nth-child(2):hover {
-    background: #d80045;
-}
-
-/* Weather Display */
-#weatherResult {
-    margin-top: 20px;
-    font-size: 18px;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Weather Icon */
-#weatherResult img {
-    width: 80px;
-}
-
-/* Error Message */
 .error {
     color: red;
     font-weight: bold;
-    margin-top: 10px;
 }
 
-/* Temperature Toggle */
 .toggle {
     display: flex;
     align-items: center;
@@ -97,20 +59,7 @@ button:nth-child(2):hover {
     font-size: 14px;
 }
 
-#unitToggle {
-    cursor: pointer;
-    transform: scale(1.2);
-}
-
-/* 7-Day Forecast Section */
-h2 {
-    margin-top: 20px;
-    font-size: 22px;
-    font-weight: bold;
-}
-
-/* Forecast Container */
-#forecast {
+#forecast, #aqiResult {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -118,7 +67,12 @@ h2 {
     margin-top: 10px;
 }
 
-/* Each Forecast Day */
+#map {
+    height: 200px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
 .forecast-day {
     background: rgba(255, 255, 255, 0.9);
     padding: 10px;
@@ -126,26 +80,13 @@ h2 {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 75px;
-    transition: 0.3s ease-in-out;
+    transition: 0.3s;
 }
 
 .forecast-day:hover {
     transform: scale(1.1);
-    background: rgba(255, 255, 255, 1);
 }
 
-/* Forecast Icon */
-.forecast-day img {
-    width: 50px;
-}
-
-/* Animation */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* Responsive Design */
 @media (max-width: 500px) {
     .container {
         width: 95%;
@@ -153,13 +94,5 @@ h2 {
 
     input {
         width: 85%;
-    }
-
-    button {
-        width: 100%;
-    }
-
-    #forecast {
-        justify-content: center;
     }
 }
