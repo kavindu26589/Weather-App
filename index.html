@@ -3,14 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Colombo Weather</title>
+  <title>Weather Dashboard</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div id="loadingSpinner" class="spinner">Loading...</div>
 
   <div class="container">
-    <h1>🌤️ Colombo Weather</h1>
+    <h1>🌤️ Weather App</h1>
+
+    <!-- Search Bar for Any City -->
+    <div style="margin-bottom: 15px;">
+      <input type="text" id="cityInput" placeholder="Enter city name" />
+      <button id="searchBtn">Search</button>
+    </div>
+
     <p id="errorMessage" class="error"></p>
 
     <!-- Current Weather -->
