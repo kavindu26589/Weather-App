@@ -72,7 +72,30 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+function updateBackground(condition) {
+  const body = document.body;
+  const main = condition.toLowerCase();
 
+  if (main.includes("clear")) {
+    // Sunny gradient
+    body.style.background = "linear-gradient(135deg, #FFD93D, #FFA800)";
+  } else if (main.includes("cloud")) {
+    // Cloudy
+    body.style.background = "linear-gradient(135deg, #bdc3c7, #2c3e50)";
+  } else if (main.includes("rain") || main.includes("drizzle")) {
+    // Rainy
+    body.style.background = "linear-gradient(135deg, #4a90e2, #145da0)";
+  } else if (main.includes("thunder")) {
+    // Thunderstorm
+    body.style.background = "linear-gradient(135deg, #2c3e50, #1e272e)";
+  } else if (main.includes("snow")) {
+    // Snow
+    body.style.background = "linear-gradient(135deg, #e6f7ff, #ffffff)";
+  } else {
+    // Default subtle gradient
+    body.style.background = "linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%)";
+  }
+}
 /** =========================
  *       MAP & CHART INIT
  *  ========================= */
@@ -171,6 +194,7 @@ async function getWeather(city) {
 
 function displayWeather(data) {
   const weatherResult = document.getElementById("weatherResult");
+  updateBackground(data.weather[0].main);
   if (!weatherResult) return;
 
   let temp = data.main.temp;
