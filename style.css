@@ -1,24 +1,26 @@
 /* General Page Styles */
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  /* Default subtle 2-tone gradient */
+  background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
   text-align: center;
   margin: 0;
   padding: 0;
-  transition: background 0.5s ease-in-out;
+  transition: background 0.5s ease-in-out; /* Smooth transitions */
 }
 
 .container {
   margin: 30px auto;
   width: 90%;
   max-width: 600px;
-  background: white;
+  background: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
+/* Spinner */
 .spinner {
   position: fixed;
   top: 50%;
@@ -28,20 +30,22 @@ body {
   background: rgba(255, 255, 255, 0.8);
   padding: 10px 20px;
   border-radius: 8px;
-  display: none; /* Hidden by default */
+  display: none;
   z-index: 9999;
 }
 
 h1 {
-  font-size: 24px;
+  font-size: 26px;
   margin-bottom: 15px;
+  color: #333;
 }
 
 .error {
-  color: red;
+  color: #ff4d4d;
   font-weight: bold;
 }
 
+/* Search Bar & Buttons */
 .search-bar {
   margin-bottom: 15px;
 }
@@ -51,13 +55,24 @@ h1 {
   width: 60%;
   max-width: 250px;
   margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .search-bar button {
   padding: 8px 12px;
   cursor: pointer;
+  background: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+.search-bar button:hover {
+  background: #0056b3;
 }
 
+/* Favorites & Compare Section */
 .favorites {
   margin-bottom: 20px;
   text-align: left;
@@ -83,6 +98,37 @@ h1 {
   justify-content: space-between;
 }
 
+#compareBtn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  background: #ffa600;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+#compareBtn:hover {
+  background: #cc7a00;
+}
+
+/* Weather & Forecast Layout */
+#weatherResult {
+  margin-bottom: 20px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+  font-size: 14px;
+}
+.toggle input {
+  cursor: pointer;
+}
+
 #map {
   height: 300px;
   margin-top: 10px;
@@ -102,34 +148,29 @@ h1 {
 .forecast-day {
   flex: 0 0 auto;
   width: 90px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.85);
   padding: 10px;
   border-radius: 10px;
   text-align: center;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
 }
-
 .forecast-day:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 15px;
-  font-size: 14px;
-}
-
+/* Chart Container */
 #comparisonChart {
   margin-top: 20px;
 }
 
+/* Responsive */
 @media (max-width: 700px) {
   .container {
     width: 95%;
+  }
+  h1 {
+    font-size: 22px;
   }
 }
